@@ -1,0 +1,31 @@
+---
+export interface Process {
+  activity: string;
+  status: string;
+  progress: number;
+}
+
+const processes: Process[] = [
+  { activity: 'Pagar o Boleto de Arrematação', status: 'Concluído', progress: 100 },
+  { activity: 'Pagar o ITBI', status: 'Pendente', progress: 0 },
+  { activity: 'Pagar a Escritura', status: 'Em andamento', progress: 50 },
+];
+---
+
+<div>
+  <h3 class="text-lg font-bold mb-2">Trilha de Implementação</h3>
+  <ul class="space-y-2">
+    {processes.map((process) => (
+      <li class="p-4 bg-white shadow rounded">
+        <h4 class="font-semibold">{process.activity}</h4>
+        <p>Status: {process.status}</p>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div
+            class="bg-blue-600 h-2.5 rounded-full"
+            style={`width: ${process.progress}%`}
+          ></div>
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>

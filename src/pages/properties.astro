@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PropertyCard from '../components/PropertyCard.astro';
+
+const properties = [
+  {
+    id: '1',
+    name: 'Apartamento no Centro',
+    location: 'São Paulo, SP',
+    valuation: 500000,
+    purpose: 'Investimento',
+    status: 'Disponível',
+  },
+  {
+    id: '2',
+    name: 'Casa na Praia',
+    location: 'Florianópolis, SC',
+    valuation: 750000,
+    purpose: 'Lazer',
+    status: 'Alugado',
+  },
+  {
+    id: '3',
+    name: 'Terreno Comercial',
+    location: 'Curitiba, PR',
+    valuation: 1200000,
+    purpose: 'Comercial',
+    status: 'Em Venda',
+  },
+];
+---
+<BaseLayout>
+  <h2 class="text-xl font-semibold mb-4">Carteira de Imóveis</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <PropertyCard properties={properties} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,31 @@
+---
+import Sidebar from '../components/Sidebar.astro';
+import Topbar from '../components/Topbar.astro';
+import '../styles/tailwind.css';
+import { supabase } from '../utils/supabaseClient';
+
+const { data: { session } } = await supabase.auth.getSession();
+
+if (!session && Astro.url.pathname !== '/sign-in') {
+  console.log("User not authenticated");
+  // throw new Error('redirect:/sign-in');
+}
+---
+
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carteira de Imóveis</title>
+    <slot name="head" />
+  </head>
+  <body class="flex bg-gray-100 text-gray-900">
+    <Sidebar />
+    <div class="flex-1 flex flex-col">
+      <Topbar />
+      <main class="p-4">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

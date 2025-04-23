@@ -1,0 +1,36 @@
+---
+export interface Loan {
+  id: string;
+  amount: number;
+  outstandingBalance: number;
+  dueDate: string;
+}
+
+const loans: Loan[] = [
+  {
+    id: '1',
+    amount: 100000,
+    outstandingBalance: 50000,
+    dueDate: '2025-05-01',
+  },
+  {
+    id: '2',
+    amount: 200000,
+    outstandingBalance: 150000,
+    dueDate: '2025-12-01',
+  },
+];
+---
+
+<div class="p-4 bg-white shadow rounded">
+  <h3 class="text-lg font-bold mb-4">Visão Geral de Empréstimos</h3>
+  <ul class="space-y-4">
+    {loans.map((loan) => (
+      <li class="p-4 bg-gray-100 rounded">
+        <p><strong>Valor do Empréstimo:</strong> R$ {loan.amount.toLocaleString('pt-BR')}</p>
+        <p><strong>Saldo Devedor:</strong> R$ {loan.outstandingBalance.toLocaleString('pt-BR')}</p>
+        <p><strong>Data de Vencimento:</strong> {new Date(loan.dueDate).toLocaleDateString('pt-BR')}</p>
+      </li>
+    ))}
+  </ul>
+</div>

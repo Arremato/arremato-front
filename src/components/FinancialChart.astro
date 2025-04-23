@@ -1,0 +1,74 @@
+<script>
+  import { onMount } from 'solid-js';
+  import Chart from 'chart.js/auto';
+
+  let chart;
+
+  const data = {
+    labels: ['2023', '2024', '2025', '2026'],
+    datasets: [
+      {
+        label: 'Despesas',
+        data: [500000, 600000, 700000, 800000],
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderWidth: 2,
+        tension: 0.4,
+      },
+      {
+        label: 'Receitas',
+        data: [200000, 300000, 400000, 500000],
+        borderColor: 'rgba(255, 159, 64, 1)',
+        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        borderWidth: 2,
+        tension: 0.4,
+      },
+      {
+        label: 'Lucro Projetado',
+        data: [300000, 400000, 500000, 600000],
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderWidth: 2,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function (value: number) {
+            return 'R$ ' + value.toLocaleString('pt-BR');
+          },
+        },
+      },
+    },
+  };
+
+  onMount(() => {
+    const canvas = document.getElementById('financialChart');
+    if (canvas) {
+      const ctx = (canvas as HTMLCanvasElement).getContext('2d');
+      if (ctx) {
+        chart = new Chart(ctx, {
+          type: 'line',
+          data,
+          options,
+        });
+      }
+    }
+  });
+</script>
+
+<div class="p-4 bg-white shadow rounded">
+  <h3 class="text-lg font-bold mb-4">Visão Geral Financeira</h3>
+  <canvas id="financialChart" width="400" height="200"></canvas>
+</div>

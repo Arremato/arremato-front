@@ -1,0 +1,93 @@
+<div class="w-64 bg-gray-900 text-gray-100 h-screen flex flex-col">
+  <!-- Logo -->
+  <div class="p-6 border-b border-gray-700">
+    <h1 class="text-2xl font-bold text-white">Easy Leilões</h1>
+  </div>
+
+  <!-- Menu -->
+  <nav class="flex-1 p-4">
+    <ul class="space-y-4">
+      <!-- Menu Principal -->
+      <li>
+        <button
+          id="dropdown-button"
+          class="block w-full text-left p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition"
+        >
+          Carteira de Imóveis
+        </button>
+      </li>
+
+      <!-- Sub menu -->
+      <ul id="dropdown-menu" class="hidden space-y-2 pl-4">
+        <li>
+          <a
+            href="/"
+            class="block p-2 rounded-lg hover:bg-gray-800 transition"
+            onclick="event.stopPropagation()"
+          >
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a
+            href="/loans"
+            class="block p-2 rounded-lg hover:bg-gray-800 transition"
+            onclick="event.stopPropagation()"
+          >
+            Empréstimos
+          </a>
+        </li>
+        <li>
+          <a
+            href="/financials"
+            class="block p-2 rounded-lg hover:bg-gray-800 transition"
+            onclick="event.stopPropagation()"
+          >
+            Financeiro
+          </a>
+        </li>
+        <li>
+          <a
+            href="/evolution"
+            class="block p-2 rounded-lg hover:bg-gray-800 transition"
+            onclick="event.stopPropagation()"
+          >
+            Evolução Patrimonial
+          </a>
+        </li>
+        <li>
+          <a
+            href="/properties"
+            class="block p-2 rounded-lg hover:bg-gray-800 transition"
+            onclick="event.stopPropagation()"
+          >
+            Propriedades
+          </a>
+        </li>
+      </ul>
+    </ul>
+  </nav>
+
+  <!-- Footer -->
+  <div class="p-4 border-t border-gray-700">
+    <p class="text-sm text-gray-400">&copy; 2025 Easy Leilões</p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dropdownButton = document.getElementById('dropdown-button');
+      const dropdownMenu = document.getElementById('dropdown-menu');
+
+      dropdownButton.addEventListener('click', (event) => {
+        dropdownMenu.classList.toggle('hidden');
+        event.stopPropagation(); 
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!dropdownMenu.classList.contains('hidden')) {
+          dropdownMenu.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+</div>

@@ -1,0 +1,40 @@
+---
+export interface Property {
+  id: string;
+  name: string;
+  location: string;
+  valuation: number;
+  purpose: string;
+}
+
+const properties: Property[] = [
+  {
+    id: '1',
+    name: 'Casa de Praia',
+    location: 'Rio de Janeiro, RJ',
+    valuation: 1200000,
+    purpose: 'residência',
+  },
+  {
+    id: '2',
+    name: 'Apartamento no Centro',
+    location: 'São Paulo, SP',
+    valuation: 850000,
+    purpose: 'aluguel',
+  },
+];
+---
+
+<div>
+  <h3 class="text-lg font-bold mb-2">Imóveis</h3>
+  <ul class="space-y-2">
+    {properties.map((property) => (
+      <li class="p-4 bg-white shadow rounded">
+        <h4 class="font-semibold">{property.name}</h4>
+        <p>Localização: {property.location}</p>
+        <p>Valor de Avaliação: R$ {property.valuation.toLocaleString('pt-BR')}</p>
+        <p>Finalidade: {property.purpose}</p>
+      </li>
+    ))}
+  </ul>
+</div>
