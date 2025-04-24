@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TextField, Button, Container, Typography, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,40 +21,27 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/api/login`, {
+        email,
+        password,
       });
 
-      if (!response.ok) {
-        throw new Error('Credenciais inválidas');
-      }
-
-      const data = await response.json();
-      sessionStorage.setItem('authToken', data.token);
+      const { token } = response.data;
+      sessionStorage.setItem('authToken', token);
       router.push('/');
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(error.response?.data?.message || 'Erro ao fazer login');
     }
   };
 
   const handleRegister = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/api/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registerData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao cadastrar usuário');
-      }
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/api/users`, registerData);
 
       setOpenRegister(false);
       alert('Usuário cadastrado com sucesso!');
     } catch (error) {
-      setRegisterError(error.message);
+      setRegisterError(error.response?.data?.message || 'Erro ao cadastrar usuário');
     }
   };
 
