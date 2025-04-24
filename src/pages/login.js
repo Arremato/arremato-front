@@ -20,7 +20,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/auth/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -40,7 +40,7 @@ export default function Login() {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/users`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH_API}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(registerData),
