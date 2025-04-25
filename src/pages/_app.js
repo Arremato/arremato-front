@@ -18,7 +18,7 @@ export default function MyApp({ Component, pageProps, router }) {
       {isLoggedIn && router.pathname !== '/login' && (
         <CustomAppBar userName={sessionStorage.getItem('userName') || 'Usuário'} />
       )}
-      <main style={isLoggedIn ? { marginLeft: '250px', padding: '16px' } : { padding: '16px' }}>
+      <main style={isLoggedIn ? { padding: '16px' } : { padding: '16px' }}>
         <ProtectedComponent {...pageProps} />
       </main>
     </>
