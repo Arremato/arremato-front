@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [expenseData, setExpenseData] = useState([]);
   const [categoryData, setCategoryData] = useState({});
   const [categories, setCategories] = useState([]); // Armazena as categorias de despesas
+  const [properties, setProperties] = useState([]); // Armazena os dados das propriedades
 
   useEffect(() => {
     fetchPropertiesData();
@@ -31,6 +32,7 @@ export default function Dashboard() {
 
       setTotalValuation(totalValuation);
       setTotalProperties(totalProperties);
+      setProperties(properties); // Armazena os dados das propriedades
 
       // Dados para o gráfico de avaliação
       const valuationData = properties.map((property) => ({
@@ -79,16 +81,19 @@ export default function Dashboard() {
 
   // Configuração do gráfico de barras (valores de avaliação e gastos por propriedade)
   const barChartData = {
-    labels: valuationData.map((data) => data.name),
+    labels: valuationData.map((data) => data.name), // Nomes das propriedades
     datasets: [
       {
         label: 'Valor de Avaliação (R$)',
-        data: valuationData.map((data) => data.valuation),
+        data: valuationData.map((data) => data.valuation), // Valores de avaliação
         backgroundColor: 'rgba(75, 192, 192, 0.6)',
       },
       {
         label: 'Gastos (R$)',
-        data: valuationData.map((data) => expenseData[data.name] || 0),
+        data: valuationData.map((data) => {
+          const property = properties.find((p) => p.name === data.name); // Encontra a propriedade pelo nome
+          return property ? expenseData[property.id] || 0 : 0; // Usa o property_id para buscar os gastos
+        }),
         backgroundColor: 'rgba(255, 99, 132, 0.6)',
       },
     ],
