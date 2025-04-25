@@ -5,7 +5,7 @@ import apiClient from '../utils/apiClient';
 export default function Financeiro() {
   const [expenses, setExpenses] = useState([]);
   const [properties, setProperties] = useState([]);
-  const [categories, setCategories] = useState([]); // Armazena as categorias de despesas
+  const [categories, setCategories] = useState([]);
   const [newExpense, setNewExpense] = useState({
     property_id: '',
     type: 'expense',
@@ -13,8 +13,8 @@ export default function Financeiro() {
     amount: '',
     category: '',
     description: '',
-    receipt: '', // Novo campo para recibo
-    funding_source: '', // Novo campo para fonte de financiamento
+    receipt: '',
+    funding_source: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [openModal, setOpenModal] = useState(false);
@@ -45,7 +45,7 @@ export default function Financeiro() {
 
   const fetchCategories = async () => {
     try {
-      const response = await apiClient.get('/api/expense-types'); // Rota para buscar categorias
+      const response = await apiClient.get('/api/expense-types');
       setCategories(response.data);
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
@@ -55,7 +55,6 @@ export default function Financeiro() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Atualiza a descrição automaticamente ao selecionar uma categoria
     if (name === 'category') {
       const selectedCategory = categories.find((category) => category.id === value);
       setNewExpense({
@@ -70,8 +69,13 @@ export default function Financeiro() {
 
   const handleAddExpense = async () => {
     try {
-      await apiClient.post('/api/transactions', newExpense);
-      fetchExpenses(); // Atualiza a lista de despesas
+      const expenseData = {
+        ...newExpense,
+        date: newExpense.date || new Date().toISOString().split('T')[0],
+      };
+
+      await apiClient.post('/api/transactions', expenseData);
+      fetchExpenses();
       setNewExpense({
         property_id: '',
         type: 'expense',
@@ -82,7 +86,7 @@ export default function Financeiro() {
         receipt: '',
         funding_source: '',
       });
-      setOpenModal(false); // Fecha o modal após o cadastro
+      setOpenModal(false);
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Erro ao cadastrar despesa');
     }
@@ -204,38 +208,43 @@ export default function Financeiro() {
         Lista de Despesas
       </Typography>
       <Grid container spacing={2}>
-        {expenses.map((expense) => (
-          <Grid item xs={12} sm={6} md={4} key={expense.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">Imóvel: {properties.find((p) => p.id === expense.property_id)?.name || 'N/A'}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Data: {expense.date}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Valor: R$ {parseFloat(expense.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Categoria: {categories.find((c) => c.id === expense.category)?.name || 'N/A'}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Descrição: {categories.find((c) => c.id === expense.category)?.description || 'N/A'}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Recibo: {expense.receipt || 'N/A'}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Fonte de Financiamento: {expense.funding_source || 'N/A'}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="small" color="primary">
-                  Ver Detalhes
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
+        {expenses
+          .slice()
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .map((expense) => (
+            <Grid item xs={12} sm={6} md={4} key={expense.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">
+                    Imóvel: {properties.find((p) => p.id === expense.property_id)?.name || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Data: {expense.date}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Valor: R$ {parseFloat(expense.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Categoria: {categories.find((c) => c.id === expense.category)?.name || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Descrição: {categories.find((c) => c.id === expense.category)?.description || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Recibo: {expense.receipt || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Fonte de Financiamento: {expense.funding_source || 'N/A'}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button size="small" color="primary">
+                    Ver Detalhes
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
       </Grid>
     </Container>
   );
