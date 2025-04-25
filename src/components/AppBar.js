@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Drawer, List, ListItem, ListItemText, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Drawer, List, ListItem, ListItemText, ListItemIcon, useMediaQuery } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import HomeWorkIcon from '@mui/icons-material/HomeWork';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
 
@@ -25,8 +29,10 @@ export default function CustomAppBar({ userName }) {
     setDrawerOpen(false);
   };
 
-  const toggleDrawer = (open) => {
-    setDrawerOpen(open);
+  const handleLogout = () => {
+    sessionStorage.removeItem('authToken'); // Remove o token da sessão
+    sessionStorage.removeItem('userName'); // Remove o nome do usuário da sessão (se aplicável)
+    router.push('/login'); // Redireciona para a página de login
   };
 
   return (
@@ -42,9 +48,22 @@ export default function CustomAppBar({ userName }) {
               <MenuIcon />
             </IconButton>
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-              <MenuItem onClick={() => handleNavigation('/')}>Dashboard</MenuItem>
-              <MenuItem onClick={() => handleNavigation('/imoveis')}>Imóveis</MenuItem>
-              <MenuItem onClick={() => handleNavigation('/financeiro')}>Financeiro</MenuItem>
+              <MenuItem onClick={() => handleNavigation('/')}>
+                <DashboardIcon sx={{ mr: 1 }} />
+                Dashboard
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigation('/imoveis')}>
+                <HomeWorkIcon sx={{ mr: 1 }} />
+                Imóveis
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigation('/financeiro')}>
+                <AttachMoneyIcon sx={{ mr: 1 }} />
+                Financeiro
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <LogoutIcon sx={{ mr: 1 }} />
+                Sair
+              </MenuItem>
             </Menu>
           </Toolbar>
         </AppBar>
@@ -58,13 +77,28 @@ export default function CustomAppBar({ userName }) {
               Bem-vindo, {userName || 'Usuário'}
             </Typography>
             <ListItem button onClick={() => handleNavigation('/')}>
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItem>
             <ListItem button onClick={() => handleNavigation('/imoveis')}>
+              <ListItemIcon>
+                <HomeWorkIcon />
+              </ListItemIcon>
               <ListItemText primary="Imóveis" />
             </ListItem>
             <ListItem button onClick={() => handleNavigation('/financeiro')}>
+              <ListItemIcon>
+                <AttachMoneyIcon />
+              </ListItemIcon>
               <ListItemText primary="Financeiro" />
+            </ListItem>
+            <ListItem button onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sair" />
             </ListItem>
           </List>
         </Drawer>
