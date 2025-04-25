@@ -1,22 +1,20 @@
-export const apiClient = async (endpoint, options = {}) => {
-  const token = sessionStorage.getItem('authToken');
+import axios from 'axios';
 
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_BASE_PATH_API,
+});
 
-  const response = await fetch(endpoint, {
-    ...options,
-    headers: {
-      ...headers,
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Erro na requisição.');
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  return response.json();
-};
+export default apiClient;
