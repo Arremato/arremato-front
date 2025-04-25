@@ -102,7 +102,7 @@ export default function Financeiro() {
         <DialogTitle>Cadastrar Nova Despesa</DialogTitle>
         <DialogContent>
           <Grid container spacing={1}>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 select
                 label="Imóvel"
@@ -118,7 +118,7 @@ export default function Financeiro() {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Data"
                 name="date"
@@ -129,7 +129,7 @@ export default function Financeiro() {
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Valor (R$)"
                 name="amount"
@@ -139,7 +139,7 @@ export default function Financeiro() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 select
                 label="Categoria"
@@ -155,7 +155,7 @@ export default function Financeiro() {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Descrição"
                 name="description"
@@ -164,7 +164,7 @@ export default function Financeiro() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Recibo"
                 name="receipt"
@@ -173,7 +173,7 @@ export default function Financeiro() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Fonte de Financiamento"
                 name="funding_source"
