@@ -212,7 +212,7 @@ export default function Financeiro() {
           .slice()
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .map((expense) => (
-            <Grid item xs={12} sm={6} md={4} key={expense.id}>
+            <Grid item size={{ xs: 12, sm: 6, md: 4 }} key={expense.id}>
               <Card>
                 <CardContent>
                   <Typography variant="h6">

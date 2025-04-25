@@ -159,7 +159,7 @@ export default function Imoveis() {
       </Typography>
       <Grid container spacing={2}>
         {properties.map((property) => (
-          <Grid item sx={12} sm={6} md={4} key={property.id}>
+          <Grid item size={{ xs: 12, sm: 6, md: 4 }} key={property.id}>
             <Card>
               <CardContent>
                 <Typography variant="h6">{property.name}</Typography>
