@@ -74,7 +74,7 @@ export default function Imoveis() {
         <DialogTitle>Cadastrar Novo Imóvel</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Nome"
                 name="name"
@@ -83,7 +83,7 @@ export default function Imoveis() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Localização"
                 name="location"
@@ -92,7 +92,7 @@ export default function Imoveis() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Avaliação (R$)"
                 name="valuation"
@@ -102,7 +102,7 @@ export default function Imoveis() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Método de Pagamento"
                 name="payment_method"
@@ -111,7 +111,7 @@ export default function Imoveis() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Data de Aquisição"
                 name="acquisition_date"
@@ -122,7 +122,7 @@ export default function Imoveis() {
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item size={{ xs: 12, md: 6 }}>
               <TextField
                 select
                 label="Finalidade"
@@ -159,7 +159,7 @@ export default function Imoveis() {
       </Typography>
       <Grid container spacing={2}>
         {properties.map((property) => (
-          <Grid item xs={12} sm={6} md={4} key={property.id}>
+          <Grid item sx={12} sm={6} md={4} key={property.id}>
             <Card>
               <CardContent>
                 <Typography variant="h6">{property.name}</Typography>
