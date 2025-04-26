@@ -13,8 +13,8 @@ export default function Dashboard() {
   const [valuationData, setValuationData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
   const [categoryData, setCategoryData] = useState({});
-  const [categories, setCategories] = useState([]); // Armazena as categorias de despesas
-  const [properties, setProperties] = useState([]); // Armazena os dados das propriedades
+  const [categories, setCategories] = useState([]);
+  const [properties, setProperties] = useState([]);
 
   useEffect(() => {
     fetchPropertiesData();
@@ -32,9 +32,8 @@ export default function Dashboard() {
 
       setTotalValuation(totalValuation);
       setTotalProperties(totalProperties);
-      setProperties(properties); // Armazena os dados das propriedades
+      setProperties(properties);
 
-      // Dados para o gráfico de avaliação
       const valuationData = properties.map((property) => ({
         name: property.name,
         valuation: parseFloat(property.valuation || 0),
@@ -50,7 +49,6 @@ export default function Dashboard() {
       const response = await apiClient.get('/api/transactions');
       const expenses = response.data;
 
-      // Dados para o gráfico de gastos por propriedade
       const expenseData = expenses.reduce((acc, expense) => {
         const propertyId = expense.property_id;
         acc[propertyId] = (acc[propertyId] || 0) + parseFloat(expense.amount || 0);
@@ -58,7 +56,6 @@ export default function Dashboard() {
       }, {});
       setExpenseData(expenseData);
 
-      // Dados para o gráfico de pizza (gastos por categoria)
       const categoryData = expenses.reduce((acc, expense) => {
         const category = expense.category;
         acc[category] = (acc[category] || 0) + parseFloat(expense.amount || 0);
@@ -79,19 +76,18 @@ export default function Dashboard() {
     }
   };
 
-  // Configuração do gráfico de barras (valores de avaliação e gastos por propriedade)
   const barChartData = {
-    labels: valuationData.map((data) => data.name), // Nomes das propriedades
+    labels: valuationData.map((data) => data.name),
     datasets: [
       {
         label: 'Valor de Avaliação (R$)',
-        data: valuationData.map((data) => data.valuation), // Valores de avaliação
+        data: valuationData.map((data) => data.valuation),
         backgroundColor: 'rgba(75, 192, 192, 0.6)',
       },
       {
         label: 'Gastos (R$)',
         data: valuationData.map((data) => {
-          const property = properties.find((p) => p.name === data.name); // Encontra a propriedade pelo nome
+          const property = properties.find((p) => p.name === data.name); 
           return property ? expenseData[property.id] || 0 : 0; // Usa o property_id para buscar os gastos
         }),
         backgroundColor: 'rgba(255, 99, 132, 0.6)',

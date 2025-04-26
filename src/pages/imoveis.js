@@ -36,7 +36,7 @@ export default function Imoveis() {
   const handleAddProperty = async () => {
     try {
       await apiClient.post('/api/properties', newProperty);
-      fetchProperties(); // Atualiza a lista de imóveis
+      fetchProperties();
       setNewProperty({
         name: '',
         location: '',
@@ -45,7 +45,7 @@ export default function Imoveis() {
         acquisition_date: '',
         purpose: '',
       });
-      setOpenModal(false); // Fecha o modal após o cadastro
+      setOpenModal(false);
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Erro ao cadastrar imóvel');
     }

@@ -30,9 +30,9 @@ export default function CustomAppBar({ userName }) {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('authToken'); // Remove o token da sessão
-    sessionStorage.removeItem('userName'); // Remove o nome do usuário da sessão (se aplicável)
-    router.push('/login'); // Redireciona para a página de login
+    sessionStorage.removeItem('authToken'); 
+    sessionStorage.removeItem('userName'); 
+    router.push('/login');
   };
 
   return (
