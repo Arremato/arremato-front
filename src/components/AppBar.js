@@ -5,6 +5,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import GavelIcon from '@mui/icons-material/Gavel'; // Ícone para Pós Arrematação
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
 
@@ -60,6 +61,10 @@ export default function CustomAppBar({ userName }) {
                 <AttachMoneyIcon sx={{ mr: 1 }} />
                 Financeiro
               </MenuItem>
+              <MenuItem onClick={() => handleNavigation('/pos-arrematacao')}>
+                <GavelIcon sx={{ mr: 1 }} />
+                Pós Arrematação
+              </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <LogoutIcon sx={{ mr: 1 }} />
                 Sair
@@ -93,6 +98,12 @@ export default function CustomAppBar({ userName }) {
                 <AttachMoneyIcon />
               </ListItemIcon>
               <ListItemText primary="Financeiro" />
+            </ListItem>
+            <ListItem button onClick={() => handleNavigation('/pos-arrematacao')}>
+              <ListItemIcon>
+                <GavelIcon />
+              </ListItemIcon>
+              <ListItemText primary="Pós Arrematação" />
             </ListItem>
             <ListItem button onClick={handleLogout}>
               <ListItemIcon>
