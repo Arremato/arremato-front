@@ -476,13 +476,35 @@ export default function Imoveis() {
           </Grid>
         );
       case 5:
+        const valorLance = parseFloat(formData.step2.valorLance) || 0;
+        const valorMercado = parseFloat(formData.step2.valorMercado) || 0;
+        const previsaoReforma = parseFloat(formData.step5.previsaoReforma) || 0;
+        const tipoTributacao = formData.step5.tipoTributacao;
+        const comissaoCorretor = parseFloat(formData.step5.comissaoCorretor) || 0;
+
+        let imposto = 0, lucro = 0;
+
+        if (tipoTributacao === 'CPF') {
+          lucro = valorMercado - (valorLance + previsaoReforma);
+          imposto = lucro * 0.15;
+        } else if (tipoTributacao === 'CNPJ') {
+          imposto = valorMercado * 0.06;
+          lucro = valorMercado - (valorLance + previsaoReforma + imposto);
+        }
+
+        const comissao = (comissaoCorretor / 100) * valorMercado;
+        const lucroLiquido = lucro - comissao;
+        const roi = ((lucroLiquido / (valorLance + previsaoReforma)) * 100).toFixed(2);
+
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
               Resumo Final
             </Typography>
             <Typography>
-              Aqui você pode exibir um resumo calculado com base nos dados preenchidos.
+              <strong>Imposto Estimado:</strong> R$ {imposto.toLocaleString('pt-BR')}<br />
+              <strong>Lucro Líquido:</strong> R$ {lucroLiquido.toLocaleString('pt-BR')}<br />
+              <strong>ROI:</strong> {roi}%
             </Typography>
           </Box>
         );
