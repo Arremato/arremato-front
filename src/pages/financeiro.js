@@ -167,6 +167,7 @@ export default function Financeiro() {
               <TableCell />
               <TableCell>Imóvel</TableCell>
               <TableCell>Localização</TableCell>
+              <TableCell>Valor de Lance</TableCell>
               <TableCell>Valor de Avaliação</TableCell>
               <TableCell>Total de Despesas</TableCell>
             </TableRow>
@@ -195,9 +196,12 @@ export default function Financeiro() {
                       </IconButton>
                     </TableCell>
                     <TableCell>{property.name}</TableCell>
-                    <TableCell>{property.location || 'N/A'}</TableCell>
+                    <TableCell>{property.address || 'N/A'}</TableCell>
                     <TableCell>
-                      R$ {parseFloat(property.valuation || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      R$ {parseFloat(property.bid_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </TableCell>
+                    <TableCell>
+                      R$ {parseFloat(property.market_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </TableCell>
                     <TableCell>
                       R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
@@ -18,9 +18,10 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+import apiClient from '../utils/apiClient';
 
 export default function Imoveis() {
-  const [activeStep, setActiveStep] = useState(0); // Controla o step ativo
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     step1: {
       nome: '',
@@ -29,6 +30,7 @@ export default function Imoveis() {
       numero: '',
       tipoImovel: '',
       estado: '',
+      finalidade: ''
     },
     step2: {
       valorLance: '',
@@ -82,25 +84,6 @@ export default function Imoveis() {
     }));
   };
 
-  const validateStep = (step) => {
-    const stepData = formData[step];
-    const stepErrors = {};
-
-    // Validação básica: verifica se todos os campos estão preenchidos
-    Object.keys(stepData).forEach((field) => {
-      if (!stepData[field]) {
-        stepErrors[field] = 'Campo obrigatório';
-      }
-    });
-
-    setErrors((prev) => ({
-      ...prev,
-      [step]: stepErrors,
-    }));
-
-    return Object.keys(stepErrors).length === 0; // Retorna true se não houver erros
-  };
-
   const handleNext = () => {
       setActiveStep((prev) => prev + 1);
   };
@@ -136,51 +119,108 @@ export default function Imoveis() {
     }
   };
 
-  const handleSubmit = () => {
-    if (validateStep(`step${activeStep + 1}`)) {
-      setImoveis((prev) => [...prev, { ...formData.step1, ...formData.step2, ...formData.step3, ...formData.step4, ...formData.step5 }]);
-      setIsModalOpen(false); // Fecha o modal
-      setFormData({
-        step1: {
-          nome: '',
-          cep: '',
-          endereco: '',
-          numero: '',
-          tipoImovel: '',
-          estado: '',
-        },
-        step2: {
-          valorLance: '',
-          valorMercado: '',
-          itbi: '',
-          registro: '',
-        },
-        step3: {
-          arrematadoSozinho: '',
-          nomeInvestidor: '',
-          valorInvestido: '',
-        },
-        step4: {
-          condominioMensal: '',
-          iptuAnual: '',
-          dividaCondominio: '',
-          dividaIptu: '',
-          outrasDividas: '',
-        },
-        step5: {
-          corretor: '',
-          comissaoCorretor: '',
-          previsaoMesesVenda: '',
-          previsaoReforma: '',
-          tipoTributacao: '',
-        },
-        step6: {
-          resumoFinal: '',
-        },
-      }); // Reseta o formulário
-      setActiveStep(0); // Volta para o primeiro step
-    }
+  const handleSubmit = async () => {
+    console.log('Dados do formulário:', formData);
+      const payload = {
+        name: formData.step1.nome,
+        postal_code: formData.step1.cep,
+        address: formData.step1.endereco,
+        number: formData.step1.numero,
+        property_type: formData.step1.tipoImovel,
+        state: formData.step1.estado,
+        bid_value: parseFloat(formData.step2.valorLance) || 0,
+        market_value: parseFloat(formData.step2.valorMercado) || 0,
+        itbi: parseFloat(formData.step2.itbi) || 0,
+        registration: parseFloat(formData.step2.registro) || 0,
+        purchased_alone: formData.step3.arrematadoSozinho === 'Sim',
+        investor_name: formData.step3.nomeInvestidor || null,
+        invested_amount: parseFloat(formData.step3.valorInvestido) || 0,
+        monthly_condo_fee: parseFloat(formData.step4.condominioMensal) || 0,
+        annual_iptu: parseFloat(formData.step4.iptuAnual) || 0,
+        condo_debt: parseFloat(formData.step4.dividaCondominio) || 0,
+        iptu_debt: parseFloat(formData.step4.dividaIptu) || 0,
+        other_debts: parseFloat(formData.step4.outrasDividas) || 0,
+        broker_name: formData.step5.corretor || null,
+        broker_commission: parseFloat(formData.step5.comissaoCorretor) || 0,
+        expected_months_to_sell: parseFloat(formData.step5.previsaoMesesVenda) || 0,
+        expected_renovation_cost: parseFloat(formData.step5.previsaoReforma) || 0,
+        taxation_type: formData.step5.tipoTributacao,
+        acquisition_date: new Date().toISOString(),
+        purpose: formData.step1.finalidade,
+      };
+
+      console.log('Payload enviado:', payload);
+
+      try {
+        const response = await apiClient.post('/api/properties', payload);
+
+        if (!response.message) {
+          const errorData = await response.json();
+          console.error('Erro ao cadastrar imóvel:', errorData.error);
+          return;
+        }
+
+        setImoveis((prev) => [...prev, response.property]);
+
+        // Fecha o modal e reseta o formulário
+        setIsModalOpen(false);
+        setFormData({
+          step1: {
+            nome: '',
+            cep: '',
+            endereco: '',
+            numero: '',
+            tipoImovel: '',
+            estado: '',
+            finalidade: '',
+          },
+          step2: {
+            valorLance: '',
+            valorMercado: '',
+            itbi: '',
+            registro: '',
+          },
+          step3: {
+            arrematadoSozinho: '',
+            nomeInvestidor: '',
+            valorInvestido: '',
+          },
+          step4: {
+            condominioMensal: '',
+            iptuAnual: '',
+            dividaCondominio: '',
+            dividaIptu: '',
+            outrasDividas: '',
+          },
+          step5: {
+            corretor: '',
+            comissaoCorretor: '',
+            previsaoMesesVenda: '',
+            previsaoReforma: '',
+            tipoTributacao: '',
+          },
+          step6: {
+            resumoFinal: '',
+          },
+        });
+        setActiveStep(0); // Volta para o primeiro step
+      } catch (error) {
+        console.error('Erro no servidor:', error);
+      }
   };
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const fetchProperties = async () => {
+    try {
+      const response = await apiClient.get('/api/properties');
+      setImoveis(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar imóveis:', error);
+    } 
+  }
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -289,6 +329,21 @@ export default function Imoveis() {
                 <MenuItem value="SP">SP</MenuItem>
                 <MenuItem value="SE">SE</MenuItem>
                 <MenuItem value="TO">TO</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                label="Finalidade"
+                value={formData.step1.purpose}
+                onChange={(e) => handleInputChange('step1', 'finalidade', e.target.value)}
+                fullWidth
+                error={!!errors.step1?.purpose}
+                helperText={errors.step1?.purpose}
+              >
+                <MenuItem value="sale">Venda</MenuItem>
+                <MenuItem value="rental">Aluguel</MenuItem>
+                <MenuItem value="residence">Moradia</MenuItem>
               </TextField>
             </Grid>
           </Grid>
@@ -535,11 +590,11 @@ export default function Imoveis() {
           <TableBody>
             {imoveis.map((imovel, index) => (
               <TableRow key={index}>
-                <TableCell>{imovel.nome}</TableCell>
-                <TableCell>{imovel.cep}</TableCell>
-                <TableCell>{imovel.endereco}</TableCell>
-                <TableCell>{imovel.valorLance}</TableCell>
-                <TableCell>{imovel.valorMercado}</TableCell>
+                <TableCell>{imovel.name}</TableCell>
+                <TableCell>{imovel.postal_code}</TableCell>
+                <TableCell>{imovel.address}</TableCell>
+                <TableCell>{imovel.bid_value}</TableCell>
+                <TableCell>{imovel.market_value}</TableCell>
               </TableRow>
             ))}
           </TableBody>

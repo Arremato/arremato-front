@@ -27,7 +27,7 @@ export default function Dashboard() {
       const response = await apiClient.get('/api/properties');
       const properties = response.data;
 
-      const totalValuation = properties.reduce((sum, property) => sum + parseFloat(property.valuation || 0), 0);
+      const totalValuation = properties.reduce((sum, property) => sum + parseFloat(property.market_value || 0), 0);
       const totalProperties = properties.length;
 
       setTotalValuation(totalValuation);
@@ -36,7 +36,7 @@ export default function Dashboard() {
 
       const valuationData = properties.map((property) => ({
         name: property.name,
-        valuation: parseFloat(property.valuation || 0),
+        valuation: parseFloat(property.market_value || 0),
       }));
       setValuationData(valuationData);
     } catch (error) {
