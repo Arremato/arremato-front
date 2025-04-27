@@ -17,7 +17,9 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton
 } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import apiClient from '../utils/apiClient';
 
 export default function Imoveis() {
@@ -64,7 +66,14 @@ export default function Imoveis() {
   const [errors, setErrors] = useState({}); // Armazena os erros de validação
   const [imoveis, setImoveis] = useState([]); // Lista de imóveis cadastrados
   const [isModalOpen, setIsModalOpen] = useState(false); // Controle do modal
-
+  const [selectedProperty, setSelectedProperty] = useState(null); // Armazena o imóvel selecionado
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // Controle do modal de visualização
+  
+  const handleViewProperty = (property) => {
+    setSelectedProperty(property);
+    setIsViewModalOpen(true);
+  };
+  
   const steps = [
     'Dados do Imóvel',
     'Dados da Compra',
@@ -593,8 +602,20 @@ export default function Imoveis() {
                 <TableCell>{imovel.name}</TableCell>
                 <TableCell>{imovel.postal_code}</TableCell>
                 <TableCell>{imovel.address}</TableCell>
-                <TableCell>{imovel.bid_value}</TableCell>
-                <TableCell>{imovel.market_value}</TableCell>
+                <TableCell>
+                  R$ {parseFloat(imovel.bid_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell>
+                  R$ {parseFloat(imovel.market_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleViewProperty(imovel)}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -628,6 +649,48 @@ export default function Imoveis() {
                 Finalizar
               </Button>
             )}
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Modal de Visualização */}
+      <Modal open={isViewModalOpen} onClose={() => setIsViewModalOpen(false)}>
+        <Box
+          sx={{
+            p: 4,
+            maxWidth: 800,
+            mx: 'auto',
+            mt: 10,
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            overflowY: 'auto',
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Detalhes do Imóvel
+          </Typography>
+          {selectedProperty && (
+            <Box>
+              <Typography><strong>Nome:</strong> {selectedProperty.name}</Typography>
+              <Typography><strong>CEP:</strong> {selectedProperty.postal_code}</Typography>
+              <Typography><strong>Endereço:</strong> {selectedProperty.address}</Typography>
+              <Typography><strong>Número:</strong> {selectedProperty.number}</Typography>
+              <Typography><strong>Tipo de Imóvel:</strong> {selectedProperty.property_type}</Typography>
+              <Typography><strong>Estado:</strong> {selectedProperty.state}</Typography>
+              <Typography><strong>Valor do Lance:</strong> R$ {parseFloat(selectedProperty.bid_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
+              <Typography><strong>Valor de Mercado:</strong> R$ {parseFloat(selectedProperty.market_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
+              <Typography><strong>Finalidade:</strong> {selectedProperty.purpose}</Typography>
+              <Typography><strong>Corretor:</strong> {selectedProperty.broker_name || 'N/A'}</Typography>
+              <Typography><strong>Comissão do Corretor:</strong> {selectedProperty.broker_commission || 'N/A'}%</Typography>
+              <Typography><strong>IPTU Anual:</strong> R$ {parseFloat(selectedProperty.annual_iptu || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
+              <Typography><strong>Outras Dívidas:</strong> R$ {parseFloat(selectedProperty.other_debts || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
+              {/* Adicione mais campos conforme necessário */}
+            </Box>
+          )}
+          <Box sx={{ mt: 4, textAlign: 'right' }}>
+            <Button variant="contained" onClick={() => setIsViewModalOpen(false)}>
+              Fechar
+            </Button>
           </Box>
         </Box>
       </Modal>

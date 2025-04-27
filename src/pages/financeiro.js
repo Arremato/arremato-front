@@ -159,6 +159,100 @@ export default function Financeiro() {
         Cadastrar Nova Despesa
       </Button>
 
+      {/* Total Receitas, Despesas, Saldo e Total Parcelado */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+        {/* Total Receitas */}
+        <Box
+          sx={{
+            backgroundColor: '#e8f5e9',
+            padding: 2,
+            borderRadius: 2,
+            textAlign: 'center',
+            flex: 1,
+            marginRight: 2,
+          }}
+        >
+          <Typography variant="subtitle1" color="green" fontWeight="bold">
+            Total Receitas
+          </Typography>
+          <Typography variant="h6" color="green" fontWeight="bold">
+            +R$ {expenses
+              .filter((expense) => expense.type === 'income')
+              .reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0)
+              .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </Typography>
+        </Box>
+
+        {/* Total Despesas */}
+        <Box
+          sx={{
+            backgroundColor: '#ffebee',
+            padding: 2,
+            borderRadius: 2,
+            textAlign: 'center',
+            flex: 1,
+            marginRight: 2,
+          }}
+        >
+          <Typography variant="subtitle1" color="red" fontWeight="bold">
+            Total Despesas
+          </Typography>
+          <Typography variant="h6" color="red" fontWeight="bold">
+            -R$ {expenses
+              .filter((expense) => expense.type === 'expense')
+              .reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0)
+              .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </Typography>
+        </Box>
+
+        {/* Saldo */}
+        <Box
+          sx={{
+            backgroundColor: '#f3e5f5',
+            padding: 2,
+            borderRadius: 2,
+            textAlign: 'center',
+            flex: 1,
+            marginRight: 2,
+          }}
+        >
+          <Typography variant="subtitle1" color="black" fontWeight="bold">
+            Saldo
+          </Typography>
+          <Typography variant="h6" color="black" fontWeight="bold">
+            R$ {(
+              expenses
+                .filter((expense) => expense.type === 'income')
+                .reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0) -
+              expenses
+                .filter((expense) => expense.type === 'expense')
+                .reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0)
+            ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </Typography>
+        </Box>
+
+        {/* Total Parcelado */}
+        <Box
+          sx={{
+            backgroundColor: '#e3f2fd',
+            padding: 2,
+            borderRadius: 2,
+            textAlign: 'center',
+            flex: 1,
+          }}
+        >
+          <Typography variant="subtitle1" color="blue" fontWeight="bold">
+            Total Parcelado
+          </Typography>
+          <Typography variant="h6" color="blue" fontWeight="bold">
+            R$ {expenses
+              .filter((expense) => expense.funding_source === 'parcelado')
+              .reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0)
+              .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </Typography>
+        </Box>
+      </Box>
+
       {/* Tabela de Imóveis e Despesas */}
       <TableContainer>
         <Table>
