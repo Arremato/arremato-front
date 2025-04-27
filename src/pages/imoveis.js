@@ -603,7 +603,7 @@ export default function Imoveis() {
 
       {/* Modal de Cadastro */}
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <Box sx={{ p: 2, maxWidth: 900, mx: 'auto', mt: 15, bgcolor: 'background.paper', borderRadius: 2 }}>
+        <Box sx={{ p: 2, maxWidth: 900, mx: 'auto', mt: 15, bgcolor: 'background.paper', borderRadius: 2, overflowY: 'auto' }}>
           <Typography variant="h6" gutterBottom>
             Cadastro de Imóvel
           </Typography>
