@@ -32,18 +32,27 @@ export default function Imoveis() {
       numero: '',
       tipoImovel: '',
       estado: '',
-      finalidade: ''
+      finalidade: '',
+      origemLeilao: '',
+      statusJuridico: '',
     },
     step2: {
       valorLance: '',
       valorMercado: '',
       itbi: '',
       registro: '',
+      itbi: '',
+      registro: '',
+      formaPagamento: '',
+      entrada: '',
+      parcelas: '',
+      valorParcela: '',
     },
     step3: {
       arrematadoSozinho: '',
       nomeInvestidor: '',
       valorInvestido: '',
+      registradoEm: '',
     },
     step4: {
       condominioMensal: '',
@@ -73,7 +82,7 @@ export default function Imoveis() {
     setSelectedProperty(property);
     setIsViewModalOpen(true);
   };
-  
+
   const steps = [
     'Dados do Imóvel',
     'Dados da Compra',
@@ -141,6 +150,13 @@ export default function Imoveis() {
         market_value: parseFloat(formData.step2.valorMercado) || 0,
         itbi: parseFloat(formData.step2.itbi) || 0,
         registration: parseFloat(formData.step2.registro) || 0,
+        payment_method: formData.step1.formaPagamento,
+        down_payment: parseFloat(formData.step2.entrada) || 0,
+        installments: parseFloat(formData.step2.parcelas) || 0,
+        installment_value: parseFloat(formData.step2.valorParcela) || 0,
+        auction_origin: formData.step1.origemLeilao,
+        legal_status: formData.step1.statusJuridico,
+        registered_in: formData.step3.registradoEm,
         purchased_alone: formData.step3.arrematadoSozinho === 'Sim',
         investor_name: formData.step3.nomeInvestidor || null,
         invested_amount: parseFloat(formData.step3.valorInvestido) || 0,
@@ -182,17 +198,26 @@ export default function Imoveis() {
             tipoImovel: '',
             estado: '',
             finalidade: '',
+            origemLeilao: '',
+            statusJuridico: '',
           },
           step2: {
             valorLance: '',
             valorMercado: '',
             itbi: '',
             registro: '',
+            itbi: '',
+            registro: '',
+            formaPagamento: '',
+            entrada: '',
+            parcelas: '',
+            valorParcela: '',
           },
           step3: {
             arrematadoSozinho: '',
             nomeInvestidor: '',
             valorInvestido: '',
+            registradoEm: '',
           },
           step4: {
             condominioMensal: '',
@@ -299,6 +324,10 @@ export default function Imoveis() {
                 <MenuItem value="Casa">Casa</MenuItem>
                 <MenuItem value="Apartamento">Apartamento</MenuItem>
                 <MenuItem value="Terreno">Terreno</MenuItem>
+                <MenuItem value="Galpão">Galpão</MenuItem>
+                <MenuItem value="Loja">Loja</MenuItem>
+                <MenuItem value="Sala">Sala</MenuItem>
+                <MenuItem value="Fazenda">Fazenda</MenuItem>
               </TextField>
             </Grid>
             <Grid item size={{ xs: 12, md: 6 }}>
@@ -355,6 +384,37 @@ export default function Imoveis() {
                 <MenuItem value="residence">Moradia</MenuItem>
               </TextField>
             </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                label="Origem do Leilão"
+                value={formData.step1.origemLeilao}
+                onChange={(e) => handleInputChange('step1', 'origemLeilao', e.target.value)}
+                fullWidth
+                error={!!errors.step1?.origemLeilao}
+                helperText={errors.step1?.origemLeilao}
+              >
+                <MenuItem value="Judicial">Judicial</MenuItem>
+                <MenuItem value="Extrajudicial">Extrajudicial</MenuItem>
+                <MenuItem value="Resale">Resale</MenuItem>
+                <MenuItem value="Caixa">Caixa</MenuItem>
+                <MenuItem value="Bradesco">Bradesco</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                label="Status Juridico"
+                value={formData.step1.statusJuridico}
+                onChange={(e) => handleInputChange('step1', 'statusJuridico', e.target.value)}
+                fullWidth
+                error={!!errors.step1?.statusJuridico}
+                helperText={errors.step1?.statusJuridico}
+              >
+                <MenuItem value="Ocupado">Ocupado</MenuItem>
+                <MenuItem value="Desocupado">Desocupado</MenuItem>
+              </TextField>
+            </Grid>
           </Grid>
         );
       case 1:
@@ -380,6 +440,76 @@ export default function Imoveis() {
                 fullWidth
                 error={!!errors.step2?.valorMercado}
                 helperText={errors.step2?.valorMercado}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="ITBI %"
+                type="number"
+                value={formData.step2.itbi}
+                onChange={(e) => handleInputChange('step2', 'itbi', e.target.value)}
+                fullWidth
+                error={!!errors.step2?.itbi}
+                helperText={errors.step2?.itbi}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Registro %"
+                type="number"
+                value={formData.step2.registro}
+                onChange={(e) => handleInputChange('step2', 'registro', e.target.value)}
+                fullWidth
+                error={!!errors.step2?.registro}
+                helperText={errors.step2?.registro}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                label="Formas de Pagamento"
+                value={formData.step1.formaPagamento}
+                onChange={(e) => handleInputChange('step1', 'formaPagamento', e.target.value)}
+                fullWidth
+                error={!!errors.step1?.formaPagamento}
+                helperText={errors.step1?.formaPagamento}
+              >
+                <MenuItem value="A Vista">A Vista</MenuItem>
+                <MenuItem value="Financiado">Financiado</MenuItem>
+                <MenuItem value="Parcelado">Parcelado</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Entrada"
+                type="number"
+                value={formData.step2.entrada}
+                onChange={(e) => handleInputChange('step2', 'entrada', e.target.value)}
+                fullWidth
+                error={!!errors.step2?.entrada}
+                helperText={errors.step2?.entrada}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Parcelas"
+                type="number"
+                value={formData.step2.parcelas}
+                onChange={(e) => handleInputChange('step2', 'parcelas', e.target.value)}
+                fullWidth
+                error={!!errors.step2?.parcelas}
+                helperText={errors.step2?.parcelas}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Valor da Parcela"
+                type="number"
+                value={formData.step2.valorParcela}
+                onChange={(e) => handleInputChange('step2', 'valorParcela', e.target.value)}
+                fullWidth
+                error={!!errors.step2?.valorParcela}
+                helperText={errors.step2?.valorParcela}
               />
             </Grid>
           </Grid>
@@ -410,6 +540,31 @@ export default function Imoveis() {
                 error={!!errors.step3?.nomeInvestidor}
                 helperText={errors.step3?.nomeInvestidor}
               />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Valor Investido"
+                type="number"
+                value={formData.step2.valorInvestido}
+                onChange={(e) => handleInputChange('step2', 'valorInvestido', e.target.value)}
+                fullWidth
+                error={!!errors.step2?.valorInvestido}
+                helperText={errors.step2?.valorInvestido}
+              />
+            </Grid>
+            <Grid item size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                label="Registrado em"
+                value={formData.step3.registradoEm}
+                onChange={(e) => handleInputChange('step3', 'registradoEm', e.target.value)}
+                fullWidth
+                error={!!errors.step3?.registradoEm}
+                helperText={errors.step3?.registradoEm}
+              >
+                <MenuItem value="CPF">CPF</MenuItem>
+                <MenuItem value="CNPJ">CNPJ</MenuItem>
+              </TextField>
             </Grid>
           </Grid>
         );
