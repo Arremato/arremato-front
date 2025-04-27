@@ -17,8 +17,11 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton
+  IconButton,
+  LinearProgress,
+  Chip
 } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import apiClient from '../utils/apiClient';
 
@@ -77,7 +80,7 @@ export default function Imoveis() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Controle do modal
   const [selectedProperty, setSelectedProperty] = useState(null); // Armazena o imóvel selecionado
   const [isViewModalOpen, setIsViewModalOpen] = useState(false); // Controle do modal de visualização
-  
+
   const handleViewProperty = (property) => {
     setSelectedProperty(property);
     setIsViewModalOpen(true);
@@ -103,7 +106,7 @@ export default function Imoveis() {
   };
 
   const handleNext = () => {
-      setActiveStep((prev) => prev + 1);
+    setActiveStep((prev) => prev + 1);
   };
 
   const handleBack = () => {
@@ -112,12 +115,12 @@ export default function Imoveis() {
 
   const handleCepChange = async (cep) => {
     handleInputChange('step1', 'cep', cep);
-  
+
     if (cep.length === 8) {
       try {
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();
-  
+
         if (!data.erro) {
           setFormData((prev) => ({
             ...prev,
@@ -139,109 +142,137 @@ export default function Imoveis() {
 
   const handleSubmit = async () => {
     console.log('Dados do formulário:', formData);
-      const payload = {
-        name: formData.step1.nome,
-        postal_code: formData.step1.cep,
-        address: formData.step1.endereco,
-        number: formData.step1.numero,
-        property_type: formData.step1.tipoImovel,
-        state: formData.step1.estado,
-        bid_value: parseFloat(formData.step2.valorLance) || 0,
-        market_value: parseFloat(formData.step2.valorMercado) || 0,
-        itbi: parseFloat(formData.step2.itbi) || 0,
-        registration: parseFloat(formData.step2.registro) || 0,
-        payment_method: formData.step1.formaPagamento,
-        down_payment: parseFloat(formData.step2.entrada) || 0,
-        installments: parseFloat(formData.step2.parcelas) || 0,
-        installment_value: parseFloat(formData.step2.valorParcela) || 0,
-        auction_origin: formData.step1.origemLeilao,
-        legal_status: formData.step1.statusJuridico,
-        registered_in: formData.step3.registradoEm,
-        purchased_alone: formData.step3.arrematadoSozinho === 'Sim',
-        investor_name: formData.step3.nomeInvestidor || null,
-        invested_amount: parseFloat(formData.step3.valorInvestido) || 0,
-        monthly_condo_fee: parseFloat(formData.step4.condominioMensal) || 0,
-        annual_iptu: parseFloat(formData.step4.iptuAnual) || 0,
-        condo_debt: parseFloat(formData.step4.dividaCondominio) || 0,
-        iptu_debt: parseFloat(formData.step4.dividaIptu) || 0,
-        other_debts: parseFloat(formData.step4.outrasDividas) || 0,
-        broker_name: formData.step5.corretor || null,
-        broker_commission: parseFloat(formData.step5.comissaoCorretor) || 0,
-        expected_months_to_sell: parseFloat(formData.step5.previsaoMesesVenda) || 0,
-        expected_renovation_cost: parseFloat(formData.step5.previsaoReforma) || 0,
-        taxation_type: formData.step5.tipoTributacao,
-        acquisition_date: new Date().toISOString(),
-        purpose: formData.step1.finalidade,
-      };
+    const payload = {
+      name: formData.step1.nome,
+      postal_code: formData.step1.cep,
+      address: formData.step1.endereco,
+      number: formData.step1.numero,
+      property_type: formData.step1.tipoImovel,
+      state: formData.step1.estado,
+      bid_value: parseFloat(formData.step2.valorLance) || 0,
+      market_value: parseFloat(formData.step2.valorMercado) || 0,
+      itbi: parseFloat(formData.step2.itbi) || 0,
+      registration: parseFloat(formData.step2.registro) || 0,
+      payment_method: formData.step1.formaPagamento,
+      down_payment: parseFloat(formData.step2.entrada) || 0,
+      installments: parseFloat(formData.step2.parcelas) || 0,
+      installment_value: parseFloat(formData.step2.valorParcela) || 0,
+      auction_origin: formData.step1.origemLeilao,
+      legal_status: formData.step1.statusJuridico,
+      registered_in: formData.step3.registradoEm,
+      purchased_alone: formData.step3.arrematadoSozinho === 'Sim',
+      investor_name: formData.step3.nomeInvestidor || null,
+      invested_amount: parseFloat(formData.step3.valorInvestido) || 0,
+      monthly_condo_fee: parseFloat(formData.step4.condominioMensal) || 0,
+      annual_iptu: parseFloat(formData.step4.iptuAnual) || 0,
+      condo_debt: parseFloat(formData.step4.dividaCondominio) || 0,
+      iptu_debt: parseFloat(formData.step4.dividaIptu) || 0,
+      other_debts: parseFloat(formData.step4.outrasDividas) || 0,
+      broker_name: formData.step5.corretor || null,
+      broker_commission: parseFloat(formData.step5.comissaoCorretor) || 0,
+      expected_months_to_sell: parseFloat(formData.step5.previsaoMesesVenda) || 0,
+      expected_renovation_cost: parseFloat(formData.step5.previsaoReforma) || 0,
+      taxation_type: formData.step5.tipoTributacao,
+      acquisition_date: new Date().toISOString(),
+      purpose: formData.step1.finalidade,
+    };
 
-      console.log('Payload enviado:', payload);
+    console.log('Payload enviado:', payload);
 
-      try {
-        const response = await apiClient.post('/api/properties', payload);
+    try {
+      const response = await apiClient.post('/api/properties', payload);
 
-        if (!response.message) {
-          const errorData = await response.json();
-          console.error('Erro ao cadastrar imóvel:', errorData.error);
-          return;
-        }
-
-        setImoveis((prev) => [...prev, response.property]);
-
-        // Fecha o modal e reseta o formulário
-        setIsModalOpen(false);
-        setFormData({
-          step1: {
-            nome: '',
-            cep: '',
-            endereco: '',
-            numero: '',
-            tipoImovel: '',
-            estado: '',
-            finalidade: '',
-            origemLeilao: '',
-            statusJuridico: '',
-          },
-          step2: {
-            valorLance: '',
-            valorMercado: '',
-            itbi: '',
-            registro: '',
-            itbi: '',
-            registro: '',
-            formaPagamento: '',
-            entrada: '',
-            parcelas: '',
-            valorParcela: '',
-          },
-          step3: {
-            arrematadoSozinho: '',
-            nomeInvestidor: '',
-            valorInvestido: '',
-            registradoEm: '',
-          },
-          step4: {
-            condominioMensal: '',
-            iptuAnual: '',
-            dividaCondominio: '',
-            dividaIptu: '',
-            outrasDividas: '',
-          },
-          step5: {
-            corretor: '',
-            comissaoCorretor: '',
-            previsaoMesesVenda: '',
-            previsaoReforma: '',
-            tipoTributacao: '',
-          },
-          step6: {
-            resumoFinal: '',
-          },
-        });
-        setActiveStep(0); // Volta para o primeiro step
-      } catch (error) {
-        console.error('Erro no servidor:', error);
+      if (!response.message) {
+        const errorData = await response.json();
+        console.error('Erro ao cadastrar imóvel:', errorData.error);
+        return;
       }
+
+      setImoveis((prev) => [...prev, response.property]);
+
+      // Fecha o modal e reseta o formulário
+      setIsModalOpen(false);
+      setFormData({
+        step1: {
+          nome: '',
+          cep: '',
+          endereco: '',
+          numero: '',
+          tipoImovel: '',
+          estado: '',
+          finalidade: '',
+          origemLeilao: '',
+          statusJuridico: '',
+        },
+        step2: {
+          valorLance: '',
+          valorMercado: '',
+          itbi: '',
+          registro: '',
+          itbi: '',
+          registro: '',
+          formaPagamento: '',
+          entrada: '',
+          parcelas: '',
+          valorParcela: '',
+        },
+        step3: {
+          arrematadoSozinho: '',
+          nomeInvestidor: '',
+          valorInvestido: '',
+          registradoEm: '',
+        },
+        step4: {
+          condominioMensal: '',
+          iptuAnual: '',
+          dividaCondominio: '',
+          dividaIptu: '',
+          outrasDividas: '',
+        },
+        step5: {
+          corretor: '',
+          comissaoCorretor: '',
+          previsaoMesesVenda: '',
+          previsaoReforma: '',
+          tipoTributacao: '',
+        },
+        step6: {
+          resumoFinal: '',
+        },
+      });
+      setActiveStep(0); // Volta para o primeiro step
+    } catch (error) {
+      console.error('Erro no servidor:', error);
+    }
   };
+
+  const lancamentos = [
+    { id: 1, lancamento: 'Agua', date: '2023-01-01', value: 100000, status: 'Pago' },
+    { id: 2, lancamento: 'Luz', date: '2023-01-01', value: 100000, status: 'Pendente' },
+    { id: 3, lancamento: 'Condominio', date: '2023-01-01', value: 100000, status: 'Parcelado' },
+    { id: 4, lancamento: 'IPTU', date: '2023-01-01', value: 100000, status: 'Pago' },
+    { id: 5, lancamento: 'Outros', date: '2023-01-01', value: 100000, status: 'Pago' },
+  ]
+
+  const todo = [[
+    { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
+    { id: 2, tarefa: 'Comprar porta', prioridade: 'Média' },
+    { id: 3, tarefa: 'Vistoria', prioridade: 'Baixa' },
+    { id: 4, tarefa: 'Venda', prioridade: 'Alta' },
+  ]
+    ,
+  [
+    { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
+    { id: 2, tarefa: 'Comprar porta', prioridade: 'Média' },
+    { id: 3, tarefa: 'Vistoria', prioridade: 'Baixa' },
+    { id: 4, tarefa: 'Venda', prioridade: 'Alta' },
+  ], [
+    { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
+    { id: 2, tarefa: 'Comprar porta', prioridade: 'Média' },
+    { id: 3, tarefa: 'Vistoria', prioridade: 'Baixa' },
+    { id: 4, tarefa: 'Venda', prioridade: 'Alta' },
+  ],
+  ]
 
   useEffect(() => {
     fetchProperties();
@@ -253,7 +284,7 @@ export default function Imoveis() {
       setImoveis(response.data);
     } catch (error) {
       console.error('Erro ao buscar imóveis:', error);
-    } 
+    }
   }
 
   const renderStepContent = (step) => {
@@ -813,35 +844,300 @@ export default function Imoveis() {
         <Box
           sx={{
             p: 4,
-            maxWidth: 800,
+            maxWidth: '70%',
             mx: 'auto',
             mt: 10,
-            bgcolor: 'background.paper',
+            bgcolor: '#F4F4F4',
             borderRadius: 2,
+            maxHeight: '80vh',
             overflowY: 'auto',
           }}
         >
-          <Typography variant="h6" gutterBottom>
-            Detalhes do Imóvel
+          <Typography variant="h4" gutterBottom>
+            <strong>
+              {selectedProperty ? selectedProperty.name : 'Imóvel'}
+            </strong>
           </Typography>
-          {selectedProperty && (
-            <Box>
-              <Typography><strong>Nome:</strong> {selectedProperty.name}</Typography>
-              <Typography><strong>CEP:</strong> {selectedProperty.postal_code}</Typography>
-              <Typography><strong>Endereço:</strong> {selectedProperty.address}</Typography>
-              <Typography><strong>Número:</strong> {selectedProperty.number}</Typography>
-              <Typography><strong>Tipo de Imóvel:</strong> {selectedProperty.property_type}</Typography>
-              <Typography><strong>Estado:</strong> {selectedProperty.state}</Typography>
-              <Typography><strong>Valor do Lance:</strong> R$ {parseFloat(selectedProperty.bid_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
-              <Typography><strong>Valor de Mercado:</strong> R$ {parseFloat(selectedProperty.market_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
-              <Typography><strong>Finalidade:</strong> {selectedProperty.purpose}</Typography>
-              <Typography><strong>Corretor:</strong> {selectedProperty.broker_name || 'N/A'}</Typography>
-              <Typography><strong>Comissão do Corretor:</strong> {selectedProperty.broker_commission || 'N/A'}%</Typography>
-              <Typography><strong>IPTU Anual:</strong> R$ {parseFloat(selectedProperty.annual_iptu || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
-              <Typography><strong>Outras Dívidas:</strong> R$ {parseFloat(selectedProperty.other_debts || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
-              {/* Adicione mais campos conforme necessário */}
-            </Box>
-          )}
+          <Box>
+            <Grid container spacing={2}>
+              {/** Lado Esquerdo */}
+              <Grid size={{ xs: 12, md: 8 }}>
+                {/** Obra e Reforma */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Resumo da Obra e Reforma</strong>
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Valor Orçado</Typography>
+                      <Typography variant="h6"><strong>R$ 16.000,00</strong></Typography>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Valor Gasto</Typography>
+                      <Typography variant="h6"><strong>R$ 12.000,00</strong></Typography>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Orçamento total em Dias</Typography>
+                      <Typography variant="h6"><strong>30 Dias</strong></Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ width: '100%', mt: 2 }}>
+                    <Typography variant="h6">Progresso da Obra</Typography>
+                    <LinearProgress variant="determinate" sx={{ height: 10, borderRadius: 2 }} value={45} />
+                  </Box>
+                </Box>
+                {/** Financeiro */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Resumo Financeiro</strong>
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Receitas</Typography>
+                      <Typography variant="h6"><strong>R$ 40.000,00</strong></Typography>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Despesas</Typography>
+                      <Typography variant="h6"><strong>R$ 25.000,00</strong></Typography>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Pago</Typography>
+                      <Typography variant="h6"><strong>R$ 20.000,00</strong></Typography>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6">Parcelado</Typography>
+                      <Typography variant="h6"><strong>R$ 5.000,00</strong></Typography>
+                    </Box>
+                  </Box>
+                  <Typography variant="h6" sx={{ mt: 2 }} gutterBottom>
+                    <strong>Últimos Lançamentos</strong>
+                  </Typography>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Vencimento</TableCell>
+                          <TableCell>Lançamento</TableCell>
+                          <TableCell>Valor</TableCell>
+                          <TableCell>Status</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {lancamentos.map((imovel, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{imovel.date}</TableCell>
+                            <TableCell>{imovel.lancamento}</TableCell>
+                            <TableCell>
+                              R$ {parseFloat(imovel.value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </TableCell>
+                            <TableCell>
+                              {imovel.status === 'Pago' ? (
+                                <Chip label="Pago" color="success" />
+                              ) : imovel.status === 'Pendente' ? (
+                                <Chip label="Pendente" color="warning" />
+                              ) : (
+                                <Chip label="Parcelado" color="info" />
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+                {/** Tarefas */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Tarefas</strong>
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6"><strong>Não iniciadas</strong></Typography>
+                      <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Tarefa</TableCell>
+                              <TableCell>Prioridade</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {todo[0].map((todo, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{todo.tarefa}</TableCell>
+                                <TableCell>
+                                  {todo.prioridade === 'Alta' ? (
+                                    <Chip label="Alta" color="warning" />
+                                  ) : todo.prioridade === 'Média' ? (
+                                    <Chip label="Média" color="info" />
+                                  ) : (
+                                    <Chip label="Baixa" color="success" />
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="body1"><strong>Em andamento</strong></Typography>
+                      <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Tarefa</TableCell>
+                              <TableCell>Prioridade</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {todo[1].map((todo, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{todo.tarefa}</TableCell>
+                                <TableCell>
+                                  {todo.prioridade === 'Alta' ? (
+                                    <Chip label="Alta" color="warning" />
+                                  ) : todo.prioridade === 'Média' ? (
+                                    <Chip label="Média" color="info" />
+                                  ) : (
+                                    <Chip label="Baixa" color="success" />
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
+                      <Typography variant="h6"><strong>Concuidas</strong></Typography>
+                      <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Tarefa</TableCell>
+                              <TableCell>Prioridade</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {todo[1].map((todo, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{todo.tarefa}</TableCell>
+                                <TableCell>
+                                  {todo.prioridade === 'Alta' ? (
+                                    <Chip label="Alta" color="warning" />
+                                  ) : todo.prioridade === 'Média' ? (
+                                    <Chip label="Média" color="info" />
+                                  ) : (
+                                    <Chip label="Baixa" color="success" />
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                  </Box>
+                </Box>
+              </Grid>
+              {/** Lado direito */}
+              <Grid size={{ xs: 12, md: 4 }}>
+                {/** Resumo de dias */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Resumo de Dias</strong>
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Desde a compra</Typography>
+                    <Typography variant="body1" color='#49AFF1'><strong>120</strong></Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Até a desocupação</Typography>
+                    <Typography variant="body1" color='#49AFF1'><strong>30</strong></Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Em reforma</Typography>
+                    <Typography variant="body1" color='#49AFF1'><strong>45</strong></Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Da reforma até a venda</Typography>
+                    <Typography variant="body1" color='#49AFF1'><strong>60</strong></Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Total do processo</Typography>
+                    <Typography variant="body1" color='#49AFF1'><strong>155</strong></Typography>
+                  </Box>
+                </Box>
+                {/** Proximos pagamentos */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Próximos pagamentos</strong>
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2, }}>
+                    <Typography variant="body1">IPTU</Typography>
+                    <Typography variant="body1" color='red'><strong>R$ 120,00</strong></Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Água</Typography>
+                    <Typography variant="body1" color='red'><strong>R$ 120,00</strong></Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="body1">Energia</Typography>
+                    <Typography variant="body1" color='red'><strong>R$ 60,00</strong></Typography>
+                  </Box>
+                </Box>
+                {/** Total a pagar */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Total a Pagar</strong>
+                  </Typography>
+                  <Typography variant="h6" color='red' gutterBottom>
+                    <strong>R$ 1.400,00</strong>
+                  </Typography>
+                </Box>
+                {/** Documentos */}
+                <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    <strong>Documentos</strong>
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Typography variant="body1">ITBI</Typography>
+                    <Box>
+                      <IconButton color="primary" sx={{ mr: 1 }}>
+                        <DownloadIcon />
+                      </IconButton>
+                      <IconButton color="primary">
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Typography variant="body1">Carta de Arrematação</Typography>
+                    <Box>
+                      <IconButton color="primary" sx={{ mr: 1 }}>
+                        <DownloadIcon />
+                      </IconButton>
+                      <IconButton color="primary">
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Typography variant="body1">Escritura</Typography>
+                    <Box>
+                      <IconButton color="primary" sx={{ mr: 1 }}>
+                        <DownloadIcon />
+                      </IconButton>
+                      <IconButton color="primary">
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
           <Box sx={{ mt: 4, textAlign: 'right' }}>
             <Button variant="contained" onClick={() => setIsViewModalOpen(false)}>
               Fechar
