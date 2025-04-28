@@ -1,20 +1,34 @@
 import { useState } from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Drawer, List, ListItem, ListItemText, ListItemIcon, useMediaQuery } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  useMediaQuery,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import GavelIcon from '@mui/icons-material/Gavel'; // Ícone para Pós Arrematação
+import GavelIcon from '@mui/icons-material/Gavel';
+import TaskIcon from '@mui/icons-material/Task'; // Ícone para Tarefas
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
 
 export default function CustomAppBar({ userName }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false); 
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,8 +45,8 @@ export default function CustomAppBar({ userName }) {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('authToken'); 
-    sessionStorage.removeItem('userName'); 
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userName');
     router.push('/login');
   };
 
@@ -64,6 +78,10 @@ export default function CustomAppBar({ userName }) {
               <MenuItem onClick={() => handleNavigation('/pos-arrematacao')}>
                 <GavelIcon sx={{ mr: 1 }} />
                 Pós Arrematação
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigation('/tarefas')}>
+                <TaskIcon sx={{ mr: 1 }} />
+                Tarefas
               </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <LogoutIcon sx={{ mr: 1 }} />
@@ -104,6 +122,12 @@ export default function CustomAppBar({ userName }) {
                 <GavelIcon />
               </ListItemIcon>
               <ListItemText primary="Pós Arrematação" />
+            </ListItem>
+            <ListItem button onClick={() => handleNavigation('/tarefas')}>
+              <ListItemIcon>
+                <TaskIcon />
+              </ListItemIcon>
+              <ListItemText primary="Tarefas" />
             </ListItem>
             <ListItem button onClick={handleLogout}>
               <ListItemIcon>
