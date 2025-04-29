@@ -20,6 +20,7 @@ import {
   Box
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import apiClient from '../utils/apiClient';
 
@@ -405,7 +406,7 @@ export default function Financeiro() {
               <TableCell>Valor</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Método de Pagamento</TableCell>
-              <TableCell>Editar</TableCell>
+              <TableCell>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -445,6 +446,9 @@ export default function Financeiro() {
                 <TableCell>
                   <IconButton color="primary" onClick={() => handleEditTransaction(transaction)}>
                     <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleDeleteTransaction(transaction.id)}>
+                    <DeleteIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
