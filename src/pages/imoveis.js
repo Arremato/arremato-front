@@ -80,10 +80,12 @@ export default function Imoveis() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Controle do modal
   const [selectedProperty, setSelectedProperty] = useState(null); // Armazena o imóvel selecionado
   const [isViewModalOpen, setIsViewModalOpen] = useState(false); // Controle do modal de visualização
+  const [transactions, setTransactions] = useState([]); // Armazena as transações financeiras do imóvel
 
   const handleViewProperty = (property) => {
     setSelectedProperty(property);
     setIsViewModalOpen(true);
+    fetchFinancialData(property.id); // Busca os dados financeiros do imóvel
   };
 
   const steps = [
@@ -246,13 +248,14 @@ export default function Imoveis() {
     }
   };
 
-  const lancamentos = [
-    { id: 1, lancamento: 'Agua', date: '2023-01-01', value: 100000, status: 'Pago' },
-    { id: 2, lancamento: 'Luz', date: '2023-01-01', value: 100000, status: 'Pendente' },
-    { id: 3, lancamento: 'Condominio', date: '2023-01-01', value: 100000, status: 'Parcelado' },
-    { id: 4, lancamento: 'IPTU', date: '2023-01-01', value: 100000, status: 'Pago' },
-    { id: 5, lancamento: 'Outros', date: '2023-01-01', value: 100000, status: 'Pago' },
-  ]
+  const currentMonthTransactions = transactions.filter((transaction) => {
+    const transactionDate = new Date(transaction.date);
+    const now = new Date();
+    return (
+      transactionDate.getMonth() === now.getMonth() &&
+      transactionDate.getFullYear() === now.getFullYear()
+    );
+  });
 
   const todo = [[
     { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
@@ -286,6 +289,15 @@ export default function Imoveis() {
       console.error('Erro ao buscar imóveis:', error);
     }
   }
+
+  const fetchFinancialData = async (propertyId) => {
+    try {
+      const response = await apiClient.get(`/api/finances/property/${propertyId}`);
+      setTransactions(response.data); // Atualiza as transações financeiras do imóvel
+    } catch (error) {
+      console.error('Erro ao buscar dados financeiros do imóvel:', error);
+    }
+  };
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -891,49 +903,132 @@ export default function Imoveis() {
                   <Typography variant="h6" gutterBottom>
                     <strong>Resumo Financeiro</strong>
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="h6">Receitas</Typography>
-                      <Typography variant="h6"><strong>R$ 40.000,00</strong></Typography>
+                  {/* Total Receitas, Despesas, Saldo e Total Parcelado */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+                    {/* Total Receitas */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#e8f5e9',
+                        padding: 2,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        flex: 1,
+                        marginRight: 2,
+                      }}
+                    >
+                      <Typography variant="subtitle1" color="green" fontWeight="bold">
+                        Total Receitas
+                      </Typography>
+                      <Typography variant="h6" color="green" fontWeight="bold">
+                        +R$ {transactions
+                          .filter((transaction) => transaction.type === 'income')
+                          .reduce((sum, transaction) => sum + parseFloat(transaction.amount || 0), 0)
+                          .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </Typography>
                     </Box>
-                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="h6">Despesas</Typography>
-                      <Typography variant="h6"><strong>R$ 25.000,00</strong></Typography>
+
+                    {/* Total Despesas */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#ffebee',
+                        padding: 2,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        flex: 1,
+                        marginRight: 2,
+                      }}
+                    >
+                      <Typography variant="subtitle1" color="red" fontWeight="bold">
+                        Total Despesas
+                      </Typography>
+                      <Typography variant="h6" color="red" fontWeight="bold">
+                        -R$ {transactions
+                          .filter((transaction) => transaction.type === 'expense')
+                          .reduce((sum, transaction) => sum + parseFloat(transaction.amount || 0), 0)
+                          .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </Typography>
                     </Box>
-                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="h6">Pago</Typography>
-                      <Typography variant="h6"><strong>R$ 20.000,00</strong></Typography>
+
+                    {/* Saldo */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#f3e5f5',
+                        padding: 2,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        flex: 1,
+                        marginRight: 2,
+                      }}
+                    >
+                      <Typography variant="subtitle1" color="black" fontWeight="bold">
+                        Saldo
+                      </Typography>
+                      <Typography variant="h6" color="black" fontWeight="bold">
+                        R$ {(
+                          transactions
+                            .filter((transaction) => transaction.type === 'income')
+                            .reduce((sum, transaction) => sum + parseFloat(transaction.amount || 0), 0) -
+                          transactions
+                            .filter((transaction) => transaction.type === 'expense')
+                            .reduce((sum, transaction) => sum + parseFloat(transaction.amount || 0), 0)
+                        ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </Typography>
                     </Box>
-                    <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="h6">Parcelado</Typography>
-                      <Typography variant="h6"><strong>R$ 5.000,00</strong></Typography>
+
+                    {/* Total Parcelado */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#e3f2fd',
+                        padding: 2,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      <Typography variant="subtitle1" color="blue" fontWeight="bold">
+                        Total Parcelado
+                      </Typography>
+                      <Typography variant="h6" color="blue" fontWeight="bold">
+                        R$ {transactions
+                          .filter((transaction) => transaction.payment_method === 'installment')
+                          .reduce((sum, transaction) => sum + parseFloat(transaction.installment_value || 0), 0)
+                          .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </Typography>
                     </Box>
                   </Box>
                   <Typography variant="h6" sx={{ mt: 2 }} gutterBottom>
-                    <strong>Últimos Lançamentos</strong>
+                    <strong>Últimos Lançamentos (Mês Corrente)</strong>
                   </Typography>
                   <TableContainer component={Paper}>
                     <Table>
                       <TableHead>
                         <TableRow>
                           <TableCell>Vencimento</TableCell>
-                          <TableCell>Lançamento</TableCell>
+                          <TableCell>Tipo</TableCell>
+                          <TableCell>Categoria</TableCell>
                           <TableCell>Valor</TableCell>
                           <TableCell>Status</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {lancamentos.map((imovel, index) => (
+                        {currentMonthTransactions.slice(0, 5).map((transaction, index) => (
                           <TableRow key={index}>
-                            <TableCell>{imovel.date}</TableCell>
-                            <TableCell>{imovel.lancamento}</TableCell>
+                            <TableCell>{new Date(transaction.date).toLocaleDateString('pt-BR')}</TableCell>
                             <TableCell>
-                              R$ {parseFloat(imovel.value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              {transaction.type === 'income' ? (
+                                <Chip label="Receita" color="success" />
+                              ) : (
+                                <Chip label="Despesa" color="error" />
+                              )}
+                            </TableCell>
+                            <TableCell>{transaction.category || 'N/A'}</TableCell>
+                            <TableCell>
+                              R$ {parseFloat(transaction.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </TableCell>
                             <TableCell>
-                              {imovel.status === 'Pago' ? (
+                              {transaction.status === 'paid' ? (
                                 <Chip label="Pago" color="success" />
-                              ) : imovel.status === 'Pendente' ? (
+                              ) : transaction.status === 'pending' ? (
                                 <Chip label="Pendente" color="warning" />
                               ) : (
                                 <Chip label="Parcelado" color="info" />
