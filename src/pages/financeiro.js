@@ -145,6 +145,15 @@ export default function Financeiro() {
     });
   };
 
+  const handleDeleteTransaction = async (id) => {
+    try {
+      await apiClient.delete(`/api/finances/${id}`); // Chama o endpoint DELETE
+      fetchTransactions(); // Atualiza a lista de transações após a exclusão
+    } catch (error) {
+      console.error('Erro ao excluir transação financeira:', error);
+    }
+  };
+
   useEffect(() => {
     fetchTransactions();
     fetchProperties();
