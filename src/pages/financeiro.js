@@ -19,6 +19,8 @@ import {
   Paper,
   Box
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
 import apiClient from '../utils/apiClient';
 
 export default function Financeiro() {
@@ -27,6 +29,7 @@ export default function Financeiro() {
   const [categories, setCategories] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
+    id: null,
     property_id: '',
     type: 'expense',
     category_id: '',
@@ -39,6 +42,7 @@ export default function Financeiro() {
     installment_value: '',
     description: '',
   });
+  const [editMode, setEditMode] = useState(false); // Define se estamos editando ou criando
 
   const fetchTransactions = async () => {
     try {
@@ -77,26 +81,51 @@ export default function Financeiro() {
   const handleAddTransaction = async () => {
     try {
       const transactionData = { ...newTransaction };
-  
+
       // Garantir que a data seja a atual se não for escolhida
       if (!transactionData.date) {
         transactionData.date = new Date().toISOString().split('T')[0];
       }
-  
-      if (transactionData.payment_method === 'installment') {
-        // Se for parcelado, usar a rota de despesas parceladas
-        await apiClient.post('/api/finances/installments', transactionData);
+
+      if (editMode) {
+        // Atualizar transação existente (remover o ID do corpo)
+        const { id, ...dataWithoutId } = transactionData;
+        await apiClient.put(`/api/finances/${id}`, dataWithoutId);
       } else {
-        // Caso contrário, usar a rota de transações gerais
-        await apiClient.post('/api/finances', transactionData);
+        // Criar nova transação
+        if (transactionData.payment_method === 'installment') {
+          await apiClient.post('/api/finances/installments', transactionData);
+        } else {
+          await apiClient.post('/api/finances', transactionData);
+        }
       }
-  
+
       fetchTransactions();
       setIsAddModalOpen(false);
       resetTransactionForm();
+      setEditMode(false); // Reseta o modo de edição
     } catch (error) {
-      console.error('Erro ao cadastrar transação financeira:', error);
+      console.error('Erro ao salvar transação financeira:', error);
     }
+  };
+
+  const handleEditTransaction = (transaction) => {
+    setNewTransaction({
+      id: transaction.id || null,
+      property_id: transaction.property_id || '',
+      type: transaction.type || 'expense',
+      category_id: transaction.category_id || '',
+      date: transaction.date || new Date().toISOString().split('T')[0],
+      amount: transaction.amount || 0,
+      status: transaction.status || 'pending',
+      payment_method: transaction.payment_method || 'cash',
+      total_installments: transaction.total_installments || 1,
+      current_installment: transaction.current_installment || 1,
+      installment_value: transaction.installment_value || '',
+      description: transaction.description || '',
+    });
+    setEditMode(true); // Ativa o modo de edição
+    setIsAddModalOpen(true); // Abre o modal
   };
 
   const resetTransactionForm = () => {
@@ -231,7 +260,7 @@ export default function Financeiro() {
 
       {/* Modal de Cadastro */}
       <Dialog open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Cadastrar Nova Transação</DialogTitle>
+        <DialogTitle>{editMode ? "Editar Transação" : "Cadastrar Nova Transação"}</DialogTitle>
         <DialogContent>
           <TextField
             select
@@ -356,7 +385,7 @@ export default function Financeiro() {
             Cancelar
           </Button>
           <Button onClick={handleAddTransaction} color="primary">
-            Cadastrar
+            {editMode ? 'Salvar Alterações' : 'Cadastrar'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -399,7 +428,11 @@ export default function Financeiro() {
                   R$ {parseFloat(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </TableCell>
                 <TableCell>
-                  {transaction.status === 'paid' ? 'Pago' : 'Pendente'}
+                  {transaction.status === 'paid' ? (
+                    <Chip label="Pago" color="success" />
+                  ) : (
+                    <Chip label="Pendente" color="error" />
+                  )}
                 </TableCell>
                 <TableCell>
                   {transaction.payment_method === 'cash'
@@ -407,6 +440,11 @@ export default function Financeiro() {
                     : transaction.payment_method === 'financed'
                       ? 'Financiado'
                       : 'Parcelado'}
+                </TableCell>
+                <TableCell>
+                  <IconButton color="primary" onClick={() => handleEditTransaction(transaction)}>
+                    <EditIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
