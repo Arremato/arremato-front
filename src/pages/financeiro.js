@@ -405,6 +405,7 @@ export default function Financeiro() {
               <TableCell>Valor</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Método de Pagamento</TableCell>
+              <TableCell>Editar</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
