@@ -68,7 +68,7 @@ export default function Tarefas() {
 
         try {
             if (editMode) {
-                await apiClient.patch(`/api/tasks/${currentTask.id}`, newTask);
+                await apiClient.put(`/api/tasks/${currentTask.id}`, newTask);
                 setTasks((prev) =>
                     prev.map((task) =>
                         task.id === currentTask.id ? { ...task, ...newTask } : task
@@ -114,7 +114,7 @@ export default function Tarefas() {
                 return 'Não iniciada';
             case 'in progress':
                 return 'Em andamento';
-            case 'concluded':
+            case 'completed':
                 return 'Conluída';
             default:
                 return 'N/A';

@@ -81,11 +81,22 @@ export default function Imoveis() {
   const [selectedProperty, setSelectedProperty] = useState(null); // Armazena o imóvel selecionado
   const [isViewModalOpen, setIsViewModalOpen] = useState(false); // Controle do modal de visualização
   const [transactions, setTransactions] = useState([]); // Armazena as transações financeiras do imóvel
+  const [tasks, setTasks] = useState([]); // Armazena as tarefas do imóvel
+
+  const fetchTasks = async (propertyId) => {
+    try {
+      const response = await apiClient.get(`/api/tasks/property/${propertyId}`);
+      setTasks(response.data); // Atualiza as tarefas do imóvel
+    } catch (error) {
+      console.error('Erro ao buscar tarefas do imóvel:', error);
+    }
+  };
 
   const handleViewProperty = (property) => {
     setSelectedProperty(property);
     setIsViewModalOpen(true);
     fetchFinancialData(property.id); // Busca os dados financeiros do imóvel
+    fetchTasks(property.id); // Busca as tarefas do imóvel
   };
 
   const steps = [
@@ -256,26 +267,6 @@ export default function Imoveis() {
       transactionDate.getFullYear() === now.getFullYear()
     );
   });
-
-  const todo = [[
-    { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
-    { id: 2, tarefa: 'Comprar porta', prioridade: 'Média' },
-    { id: 3, tarefa: 'Vistoria', prioridade: 'Baixa' },
-    { id: 4, tarefa: 'Venda', prioridade: 'Alta' },
-  ]
-    ,
-  [
-    { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
-    { id: 2, tarefa: 'Comprar porta', prioridade: 'Média' },
-    { id: 3, tarefa: 'Vistoria', prioridade: 'Baixa' },
-    { id: 4, tarefa: 'Venda', prioridade: 'Alta' },
-  ], [
-    { id: 1, tarefa: 'Limpar o imóvel', prioridade: 'Alta' },
-    { id: 2, tarefa: 'Comprar porta', prioridade: 'Média' },
-    { id: 3, tarefa: 'Vistoria', prioridade: 'Baixa' },
-    { id: 4, tarefa: 'Venda', prioridade: 'Alta' },
-  ],
-  ]
 
   useEffect(() => {
     fetchProperties();
@@ -1046,8 +1037,9 @@ export default function Imoveis() {
                     <strong>Tarefas</strong>
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    {/* Não Iniciadas */}
                     <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="h6"><strong>Não iniciadas</strong></Typography>
+                      <Typography variant="h6"><strong>Não Iniciadas</strong></Typography>
                       <TableContainer component={Paper}>
                         <Table>
                           <TableHead>
@@ -1057,13 +1049,13 @@ export default function Imoveis() {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {todo[0].map((todo, index) => (
+                            {tasks.filter(task => task.status === 'pending').map((task, index) => (
                               <TableRow key={index}>
-                                <TableCell>{todo.tarefa}</TableCell>
+                                <TableCell>{task.name}</TableCell>
                                 <TableCell>
-                                  {todo.prioridade === 'Alta' ? (
+                                  {task.priority === 'high' ? (
                                     <Chip label="Alta" color="warning" />
-                                  ) : todo.prioridade === 'Média' ? (
+                                  ) : task.priority === 'medium' ? (
                                     <Chip label="Média" color="info" />
                                   ) : (
                                     <Chip label="Baixa" color="success" />
@@ -1075,8 +1067,10 @@ export default function Imoveis() {
                         </Table>
                       </TableContainer>
                     </Box>
+
+                    {/* Em Andamento */}
                     <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="body1"><strong>Em andamento</strong></Typography>
+                      <Typography variant="h6"><strong>Em Andamento</strong></Typography>
                       <TableContainer component={Paper}>
                         <Table>
                           <TableHead>
@@ -1086,13 +1080,13 @@ export default function Imoveis() {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {todo[1].map((todo, index) => (
+                            {tasks.filter(task => task.status === 'in progress').map((task, index) => (
                               <TableRow key={index}>
-                                <TableCell>{todo.tarefa}</TableCell>
+                                <TableCell>{task.name}</TableCell>
                                 <TableCell>
-                                  {todo.prioridade === 'Alta' ? (
+                                  {task.priority === 'high' ? (
                                     <Chip label="Alta" color="warning" />
-                                  ) : todo.prioridade === 'Média' ? (
+                                  ) : task.priority === 'medium' ? (
                                     <Chip label="Média" color="info" />
                                   ) : (
                                     <Chip label="Baixa" color="success" />
@@ -1104,8 +1098,10 @@ export default function Imoveis() {
                         </Table>
                       </TableContainer>
                     </Box>
+
+                    {/* Concluídas */}
                     <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
-                      <Typography variant="h6"><strong>Concuidas</strong></Typography>
+                      <Typography variant="h6"><strong>Concluídas</strong></Typography>
                       <TableContainer component={Paper}>
                         <Table>
                           <TableHead>
@@ -1115,13 +1111,13 @@ export default function Imoveis() {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {todo[1].map((todo, index) => (
+                            {tasks.filter(task => task.status === 'completed').map((task, index) => (
                               <TableRow key={index}>
-                                <TableCell>{todo.tarefa}</TableCell>
+                                <TableCell>{task.name}</TableCell>
                                 <TableCell>
-                                  {todo.prioridade === 'Alta' ? (
+                                  {task.priority === 'high' ? (
                                     <Chip label="Alta" color="warning" />
-                                  ) : todo.prioridade === 'Média' ? (
+                                  ) : task.priority === 'medium' ? (
                                     <Chip label="Média" color="info" />
                                   ) : (
                                     <Chip label="Baixa" color="success" />
