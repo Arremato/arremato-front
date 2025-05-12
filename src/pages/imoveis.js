@@ -25,6 +25,22 @@ import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import apiClient from '../utils/apiClient';
 
+const calculateProgress = (startDate, totalDays) => {
+  if (!startDate || !totalDays) return { progress: 0, color: 'success' };
+
+  const start = new Date(startDate);
+  const now = new Date();
+  const elapsedDays = Math.floor((now - start) / (1000 * 60 * 60 * 24)); // Dias passados
+  const progress = Math.min((elapsedDays / totalDays) * 100, 100); // Progresso em %
+
+  let color = 'success'; // Verde
+  if (progress > 90) color = 'error'; // Vermelho
+  else if (progress > 80) color = 'warning'; // Laranja
+  else if (progress > 50) color = 'info'; // Azul
+
+  return { progress, color };
+};
+
 export default function Imoveis() {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -82,6 +98,7 @@ export default function Imoveis() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false); // Controle do modal de visualização
   const [transactions, setTransactions] = useState([]); // Armazena as transações financeiras do imóvel
   const [tasks, setTasks] = useState([]); // Armazena as tarefas do imóvel
+  const [construction, setConstruction] = useState(null); // Armazena a obra do imóvel
 
   const fetchTasks = async (propertyId) => {
     try {
@@ -92,11 +109,22 @@ export default function Imoveis() {
     }
   };
 
+  const fetchConstruction = async (propertyId) => {
+    try {
+      const response = await apiClient.get(`/api/constructions/property/${propertyId}`);
+      setConstruction(response.data || null); // Atualiza a obra ou define como null se não houver
+    } catch (error) {
+      console.error('Erro ao buscar obra do imóvel:', error);
+      setConstruction(null); // Define como null em caso de erro
+    }
+  };
+
   const handleViewProperty = (property) => {
     setSelectedProperty(property);
     setIsViewModalOpen(true);
     fetchFinancialData(property.id); // Busca os dados financeiros do imóvel
     fetchTasks(property.id); // Busca as tarefas do imóvel
+    fetchConstruction(property.id); // Busca a obra do imóvel
   };
 
   const steps = [
@@ -873,20 +901,45 @@ export default function Imoveis() {
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
                       <Typography variant="h6">Valor Orçado</Typography>
-                      <Typography variant="h6"><strong>R$ 16.000,00</strong></Typography>
+                      <Typography variant="h6">
+                        <strong>
+                          R$ {parseFloat(construction?.budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </strong>
+                      </Typography>
                     </Box>
                     <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
                       <Typography variant="h6">Valor Gasto</Typography>
-                      <Typography variant="h6"><strong>R$ 12.000,00</strong></Typography>
+                      <Typography variant="h6">
+                        <strong>
+                          R$ {parseFloat(construction?.spent || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </strong>
+                      </Typography>
                     </Box>
                     <Box sx={{ p: 2, border: 1, borderColor: '#EFEFEF', borderRadius: 2, bgcolor: '#FEFEFE' }}>
                       <Typography variant="h6">Orçamento total em Dias</Typography>
-                      <Typography variant="h6"><strong>30 Dias</strong></Typography>
+                      <Typography variant="h6">
+                        <strong>{construction?.delivery_days || 'N/A'} Dias</strong>
+                      </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ width: '100%', mt: 2 }}>
                     <Typography variant="h6">Progresso da Obra</Typography>
-                    <LinearProgress variant="determinate" sx={{ height: 10, borderRadius: 2 }} value={45} />
+                    {construction ? (
+                      (() => {
+                        const { progress, color } = calculateProgress(construction.start_date, construction.delivery_days);
+                        return (
+                          <LinearProgress
+                            variant="determinate"
+                            sx={{ height: 10, borderRadius: 2, bgcolor: '#EFEFEF', '& .MuiLinearProgress-bar': { bgcolor: color } }}
+                            value={progress}
+                          />
+                        );
+                      })()
+                    ) : (
+                      <Typography variant="body1" color="textSecondary">
+                        Nenhuma obra cadastrada para este imóvel.
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
                 {/** Financeiro */}

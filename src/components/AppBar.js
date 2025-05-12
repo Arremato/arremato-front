@@ -19,7 +19,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import GavelIcon from '@mui/icons-material/Gavel';
-import TaskIcon from '@mui/icons-material/Task'; // Ícone para Tarefas
+import TaskIcon from '@mui/icons-material/Task';
+import BuildIcon from '@mui/icons-material/Build';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
 
@@ -79,6 +80,10 @@ export default function CustomAppBar({ userName }) {
                 <GavelIcon sx={{ mr: 1 }} />
                 Pós Arrematação
               </MenuItem>
+              <MenuItem onClick={() => handleNavigation('/obra-reforma')}>
+                <BuildIcon sx={{ mr: 1 }} />
+                Obra & Reforma
+              </MenuItem>
               <MenuItem onClick={() => handleNavigation('/tarefas')}>
                 <TaskIcon sx={{ mr: 1 }} />
                 Tarefas
@@ -122,6 +127,12 @@ export default function CustomAppBar({ userName }) {
                 <GavelIcon />
               </ListItemIcon>
               <ListItemText primary="Pós Arrematação" />
+            </ListItem>
+            <ListItem button onClick={() => handleNavigation('/obra-reforma')}>
+              <ListItemIcon>
+                <BuildIcon />
+              </ListItemIcon>
+              <ListItemText primary="Obra & Reforma" />
             </ListItem>
             <ListItem button onClick={() => handleNavigation('/tarefas')}>
               <ListItemIcon>
