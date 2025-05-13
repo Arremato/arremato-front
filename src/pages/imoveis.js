@@ -112,7 +112,8 @@ export default function Imoveis() {
   const fetchConstruction = async (propertyId) => {
     try {
       const response = await apiClient.get(`/api/constructions/property/${propertyId}`);
-      setConstruction(response.data || null); // Atualiza a obra ou define como null se não houver
+      console.log('Dados da obra:', response.data);
+      setConstruction(response.data[0] || null); // Atualiza a obra ou define como null se não houver
     } catch (error) {
       console.error('Erro ao buscar obra do imóvel:', error);
       setConstruction(null); // Define como null em caso de erro
@@ -179,6 +180,16 @@ export default function Imoveis() {
         console.error('Erro ao buscar o endereço:', error);
       }
     }
+  };
+
+  const calculateElapsedDays = (startDate) => {
+    if (!startDate) return 0;
+
+    const start = new Date(startDate);
+    const now = new Date();
+    const elapsedDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+
+    return elapsedDays;
   };
 
   const handleSubmit = async () => {
@@ -893,7 +904,7 @@ export default function Imoveis() {
             <Grid container spacing={2}>
               {/** Lado Esquerdo */}
               <Grid size={{ xs: 12, md: 8 }}>
-                {/** Obra e Reforma */}
+                {/* Obra e Reforma */}
                 <Box sx={{ bgcolor: 'white', borderRadius: 2, border: 1, borderColor: '#EFEFEF', p: 2, mb: 2 }}>
                   <Typography variant="h6" gutterBottom>
                     <strong>Resumo da Obra e Reforma</strong>
@@ -926,7 +937,7 @@ export default function Imoveis() {
                     <Typography variant="h6">Progresso da Obra</Typography>
                     {construction ? (
                       (() => {
-                        const { progress, color } = calculateProgress(construction.start_date, construction.delivery_days);
+                        const { progress, color } = calculateProgress(construction.created_at, construction.delivery_days);
                         return (
                           <LinearProgress
                             variant="determinate"
@@ -1202,11 +1213,17 @@ export default function Imoveis() {
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
                     <Typography variant="body1">Em reforma</Typography>
-                    <Typography variant="body1" color='#49AFF1'><strong>45</strong></Typography>
+                    <Typography variant="body1" color='#49AFF1'>
+                      <strong>
+                        {construction?.created_at
+                          ? `${calculateElapsedDays(construction.created_at)} Dias`
+                          : 'N/A'}
+                      </strong>
+                    </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
                     <Typography variant="body1">Da reforma até a venda</Typography>
-                    <Typography variant="body1" color='#49AFF1'><strong>60</strong></Typography>
+                    <Typography variant="body1" color='#49AFF1'><strong>6</strong></Typography>
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
                     <Typography variant="body1">Total do processo</Typography>

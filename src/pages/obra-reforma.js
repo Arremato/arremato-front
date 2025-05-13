@@ -70,7 +70,7 @@ export default function ObraReforma() {
     };
 
     const handleAddConstruction = async () => {
-        if (!newTask.name || !newTask.property_id || !newTask.budget || !newTask.delivery_days) {
+        if (!newTask.property_id || !newTask.budget || !newTask.delivery_days) {
             alert('Todos os campos obrigatórios devem ser preenchidos!');
             return;
         }
