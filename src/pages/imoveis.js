@@ -233,14 +233,15 @@ export default function Imoveis() {
 
     try {
       const response = await apiClient.post('/api/properties', payload);
+      console.log('Resposta do servidor:', response);
 
-      if (!response.message) {
+      if (!response.data.message) {
         const errorData = await response.json();
         console.error('Erro ao cadastrar imóvel:', errorData.error);
         return;
       }
 
-      setImoveis((prev) => [...prev, response.property]);
+      setImoveis((prev) => [...prev, response.data.property]);
 
       // Fecha o modal e reseta o formulário
       setIsModalOpen(false);
